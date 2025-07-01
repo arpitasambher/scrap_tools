@@ -1,0 +1,336 @@
+# # ✅ Required for Jupyter to avoid asyncio errors
+# import nest_asyncio
+# nest_asyncio.apply()
+
+# # ✅ Imports
+# from scrapegraphai.graphs import SmartScraperGraph
+# import json
+
+# # ✅ URL to test
+# url = "https://www.thehindu.com/news/"
+
+# # ✅ Prompt
+# prompt = (
+#     "Extract the FULL plain text content related  from the main article body of the webpage. "
+#     "Do NOT summarize. Do NOT label fields. Do NOT skip details. "
+#     "Return the entire readable article exactly as it appears."
+# )
+
+# # ✅ Config for local Ollama model
+# graph_config = {
+#     "llm": {
+#         "model": "ollama/llama3.2:1b",
+#         "temperature": 0.7,
+#         "format": "json",
+#         "model_tokens": 2000,
+#         "base_url": "http://localhost:11434"
+#     }
+# }
+
+# # ✅ SmartScraper setup
+# smart_scraper_graph = SmartScraperGraph(
+#     source=url,
+#     config=graph_config,
+#     prompt=prompt
+# )
+
+# # ✅ Run the scrape
+# result = smart_scraper_graph.run()
+
+# # ✅ Pretty print result
+# print(json.dumps(result, indent=2))
+
+# # ✅ Save to file
+# with open("scraped_result2.json", "w", encoding="utf-8") as f:
+#     json.dump(result, f, indent=2)
+
+# print("📁 Result saved to scraped_result2.json")
+
+
+
+
+
+
+
+
+# ✅ Avoid asyncio issues in Jupyter
+# import nest_asyncio
+# nest_asyncio.apply()
+
+# # ✅ Imports
+# from scrapegraphai.graphs import SmartScraperGraph
+# import json
+
+# # ✅ Article URL (replace with any full news article link)
+# url = "https://www.thehindu.com/news/national/pahalgam-terror-attack-nia-arrests-two-men-for-harbouring-terrorists/article69723788.ece"
+
+# # ✅ Optimized prompt
+# prompt = (
+#     "Extract only the full article text content from the main body of the news page. "
+#     "Ignore navigation, ads, menus, headers, and footers. "
+#     "Do not summarize or label. Output the entire article in plain text."
+# )
+
+# # ✅ Scraper config using local Ollama
+# graph_config = {
+#     "llm": {
+#         "model": "ollama/llama3.2:1b",
+#         "temperature": 0.3,
+#         "format": "json",
+#         "model_tokens": 2000,
+#         "base_url": "http://localhost:11434"
+#     }
+# }
+
+# # ✅ Build the SmartScraperGraph
+# scraper = SmartScraperGraph(
+#     source=url,
+#     config=graph_config,
+#     prompt=prompt
+# )
+
+# # ✅ Run the scraper
+# import time
+# start = time.time()
+# print("⚙️ Running scraper...")
+
+# try:
+#     result = scraper.run()
+#     print("✅ Scraper finished.")
+# except Exception as e:
+#     print("❌ Scraper failed:", e)
+
+# print(f"⏱️ Total time taken: {time.time() - start:.2f} seconds")
+
+
+# # ✅ Print nicely
+# print(json.dumps(result, indent=2, ensure_ascii=False))
+
+# # ✅ Save to file
+# with open("scraped_article.json", "w", encoding="utf-8") as f:
+#     json.dump(result, f, indent=2, ensure_ascii=False)
+
+# print("✅ Scraped content saved to scraped_article.json")
+
+
+# import requests
+
+# # ✅ Fetch HTML manually (as Scrapegraph would)
+# url = "https://www.thehindu.com/news/national/pahalgam-terror-attack-nia-arrests-two-men-for-harbouring-terrorists/article69723788.ece"
+# html = requests.get(url).text
+
+# print(f"🌐 Article HTML fetched, length: {len(html)}")
+
+# # ✅ Test Ollama LLM directly
+# payload = {
+#     "model": "llama3.2:1b",
+#     "prompt": "Extract only the article body from this HTML:\n\n" + html[:4000],  # reduce input for test
+#     "stream": False
+# }
+
+# print("🧠 Sending to LLM...")
+
+# response = requests.post("http://localhost:11434/api/generate", json=payload)
+# print("✅ LLM response received\n")
+
+# print(response.json()['response'])
+
+
+
+
+
+
+
+
+# import requests
+# from bs4 import BeautifulSoup
+# import json
+
+# # Step 1: Fetch article HTML
+# url = "https://www.thehindu.com/news/national/pahalgam-terror-attack-nia-arrests-two-men-for-harbouring-terrorists/article69723788.ece"
+# response = requests.get(url)
+# html = response.text
+# print("✅ Fetched HTML")
+
+# # Step 2: Use known class used in The Hindu article content
+# soup = BeautifulSoup(html, 'html.parser')
+
+# # The Hindu often uses <div class="articlebodycontent"> or <div class="article-content">
+# article_div = soup.find("div", class_="articlebodycontent") or soup.find("div", class_="article-content")
+
+# if not article_div:
+#     print("❌ Could not find article body.")
+#     exit()
+
+# article_text = article_div.get_text(separator="\n", strip=True)
+# print(f"🧾 Extracted text length: {len(article_text)} characters")
+
+# # Step 3: Send to Ollama LLM
+# ollama_payload = {
+#     "model": "mistral:latest",
+#     "prompt": (
+#         "Here is the content of a news article. "
+#         "Clean it up by removing navigation links, ads, or unrelated text if any, "
+#         "and return only the readable article text:\n\n"
+#         + article_text[:4000]
+#     ),
+#     "stream": False
+# }
+
+# print("🧠 Sending to Ollama...")
+
+# llm_response = requests.post("http://localhost:11434/api/generate", json=ollama_payload)
+
+# result_text = llm_response.json().get('response', '').strip()
+
+# # Step 4: Save and display
+# print("\n✅ Final Cleaned Article:\n")
+# print(result_text)
+
+# with open("scraped_article.txt", "w", encoding="utf-8") as f:
+#     f.write(result_text)
+
+# print("\n📁 Saved to scraped_article.txt")
+
+
+
+
+
+
+
+
+
+
+# import requests
+# from bs4 import BeautifulSoup
+# import json
+
+# def extract_article_text(html):
+#     soup = BeautifulSoup(html, 'html.parser')
+
+#     # ✅ Priority list of known common article containers
+#     candidate_selectors = [
+#         {"tag": "article"},  # ✅ semantic tag
+#         {"tag": "div", "class_": "article-content"},
+#         {"tag": "div", "class_": "articlebodycontent"},
+#         {"tag": "div", "class_": "story-detail"},
+#         {"tag": "div", "class_": "td-post-content"},
+#         {"tag": "div", "class_": "content__article-body"},
+#         {"tag": "div", "class_": "post-content"},
+#         {"tag": "div", "class_": "entry-content"},
+#         {"tag": "div", "class_": "main-content"},
+#     ]
+
+#     for selector in candidate_selectors:
+#         tag = selector["tag"]
+#         class_ = selector.get("class_")
+#         matches = soup.find_all(tag, class_=class_) if class_ else soup.find_all(tag)
+#         for match in matches:
+#             text = match.get_text(separator="\n", strip=True)
+#             if len(text) > 500:  # only return if it's non-empty article-sized
+#                 return text
+
+#     # 🚨 Fallback: largest <div> with many <p> tags
+#     print("🔎 Using fallback: finding longest <div> with <p> tags...")
+#     candidates = soup.find_all("div")
+#     best = ""
+#     for c in candidates:
+#         ps = c.find_all("p")
+#         if len(ps) >= 3:  # heuristically enough paragraphs
+#             combined = "\n".join(p.get_text(strip=True) for p in ps)
+#             if len(combined) > len(best):
+#                 best = combined
+#     return best or "❌ Could not extract article content."
+
+# # ✅ MAIN SCRIPT STARTS
+# url = "https://www.thehindu.com/news/national/pahalgam-terror-attack-nia-arrests-two-men-for-harbouring-terrorists/article69723788.ece"
+# html = requests.get(url).text
+# print("✅ HTML fetched.")
+
+# # ✅ Extract content
+# article_text = extract_article_text(html)
+# print(f"🧾 Extracted content length: {len(article_text)} chars")
+
+# # ✅ Send to Ollama for cleaning
+# ollama_payload = {
+#     "model": "mistral:latest",
+#     "prompt": (
+#         "Clean the following news article content. Remove unrelated navigation or metadata if any, and return only the plain readable article:\n\n"
+#         + article_text[:4000]
+#     ),
+#     "stream": False
+# }
+
+# print("🧠 Sending to Ollama...")
+# llm_response = requests.post("http://localhost:11434/api/generate", json=ollama_payload)
+# cleaned = llm_response.json().get("response", "").strip()
+
+# # ✅ Save and print
+# with open("cleaned_article.txt", "w", encoding="utf-8") as f:
+#     f.write(cleaned)
+
+# print("\n✅ Final cleaned article:\n")
+# print(cleaned)
+# print("\n📁 Saved to cleaned_article.txt")
+
+
+
+
+
+
+import nest_asyncio
+nest_asyncio.apply()
+
+import json
+import time
+from scrapegraphai.graphs import SmartScraperGraph
+
+# ✅ News article URL
+url = "https://medium.com/@services.nitor1122/what-is-artificial-intelligence-complete-understanding-a0a08ba14935"
+
+# ✅ Refined prompt for better extraction
+prompt = (
+    "Extract the full article text from the main body of this news page. "
+    "Do not include navigation menus, ads, headers, footers, or metadata. "
+    "Return only the clean article content as plain text, without labels or summaries."
+)
+
+# ✅ LLM config (Mistral via Ollama)
+graph_config = {
+    "llm": {
+        "model": "ollama/mistral:latest",  # or "ollama/llama3.2:1b"
+        "temperature": 0.3,
+        "format": "json",
+        "model_tokens": 1500,
+        "base_url": "http://localhost:11434"
+    }
+}
+
+# ✅ Create and run the SmartScraperGraph
+scraper_graph = SmartScraperGraph(
+    source=url,
+    config=graph_config,
+    prompt=prompt
+)
+
+start = time.time()
+print("⚙️ Running Scrapegraph AI...")
+
+try:
+    result = scraper_graph.run()
+    print("####"*10)
+    print(result)
+    print("✅ Scraper finished.")
+except Exception as e:
+    print("❌ Scraper failed:", e)
+    result = {}
+
+print(f"⏱️ Time taken: {time.time() - start:.2f} seconds")
+
+# ✅ Output and save
+print(json.dumps(result, indent=2, ensure_ascii=False))
+
+with open("scraped_result_sgai.json", "w", encoding="utf-8") as f:
+    json.dump(result, f, indent=2, ensure_ascii=False)
+
+print("📁 Saved to scraped_result_sgai.json")
