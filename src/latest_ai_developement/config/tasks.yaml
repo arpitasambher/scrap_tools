@@ -1,0 +1,11 @@
+research_task:
+  description: >
+    Generate permutations, build AML queries, fetch search results, and scrape pages.
+  expected_output: >
+    JSON data with permutations, queries, and scraped results.
+
+reporting_task:
+  description: >
+    Summarize findings and produce AMLReport.
+  expected_output: >
+    AMLReport JSON with summary and metrics.
