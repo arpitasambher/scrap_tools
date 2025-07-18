@@ -1,13 +1,9 @@
 permutation_task:
   description: >
-    Generate multiple permutations of user-provided data for AML scenarios. 
-    Use ONLY the permutation_tool to complete this task. 
-    Do not delegate this to any other agent.
+    Use the permuatation tool for generating the permutations. Use ONLY the permutation_tool to complete this task. Do not delegate this to any other agent.
     
   expected_output: >
-    A JSON array of user data permutations stored in output/permuted_user_data.json 
-    and returned as a dictionary.
-    
+    The inputs have been given to you, give these inputs to tool user_data: {user_data}, num_permutations: {num_permutations}.    
   agent: permutation_agent
   output_file: permuted_user_data.json
 

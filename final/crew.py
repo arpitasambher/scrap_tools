@@ -145,7 +145,7 @@ llm = LLM(
 )
 
 @tool("permutation_tool")
-def permutation_tool():
+def permutation_tool(user_data: dict, num_permutations: str):
     """
     Generate permutations for AML based on user inputs.
 
@@ -157,10 +157,10 @@ def permutation_tool():
         list: A list of generated permutations.
     """
     print("[CHECKPOINT] Entered permutation_tool")
-    print(f"[INPUT] user_inputs: {inputs.get("user_data")} ")
+    print(f"[INPUT] user_inputs: {user_data}, num_permutations: {num_permutations}")
     start_time = time.time()
 
-    result = generate_permutations(inputs.get("user_data"), inputs.get("user_data").get("num_permutations", 5))
+    result = generate_permutations(user_data, num_permutations)
 
     print(f"[OUTPUT] Generated {len(result)} permutations")
     print(f"[TIME] permutation_tool completed in {time.time() - start_time:.2f}s")
