@@ -96,11 +96,19 @@ import json
 import os
 import requests
 from dotenv import load_dotenv
+import sys
 
-# ✅ Load .env file (update path if needed)
-load_dotenv("/workspace/siriusAI/temp1/project-root/src/latest_ai_development/.env")
 
-API_KEY = os.getenv('OPENROUTER_API_KEY')
+# Correct path to the .env file (relative or absolute)
+env_path = os.path.abspath("scrap_tools/final/.env")
+print(env_path)
+print("*"*100)
+load_dotenv(dotenv_path=env_path)
+
+API_KEY = os.getenv("OPENROUTER_API_KEY")
+print(API_KEY)
+print("*"*100)
+
 if not API_KEY:
     raise ValueError("❌ API key not loaded. Check your .env file path and key name.")
 
@@ -118,45 +126,45 @@ def generate_permutations(user_data, num):
 
     # Build the prompt
     prompt = f"""
-You are an expert data variation generator. Given a dictionary of user data, your job is to produce exactly **{num} realistic permutations** of that data.
+    You are an expert data variation generator. Given a dictionary of user data, your job is to produce exactly **{num} realistic permutations** of that data.
 
-Each permutation MUST include changes in the **name field**. You must vary names in at least one of the following ways:
-- Typo or keyboard error
-- Initials (e.g., "V. Mallaya")
-- All caps or lowercase
-- First or last name swapped
-- Extra or missing letters
-- Dots, dashes, or alternate spacing
+    Each permutation MUST include changes in the **name field**. You must vary names in at least one of the following ways:
+    - Typo or keyboard error
+    - Initials (e.g., "V. Mallaya")
+    - All caps or lowercase
+    - First or last name swapped
+    - Extra or missing letters
+    - Dots, dashes, or alternate spacing
 
-Also include variations in:
-- Phone number
-- Paytm link
-- Email
-- Country
-- Age
-- Capitalization or spacing differences
+    Also include variations in:
+    - Phone number
+    - Paytm link
+    - Email
+    - Country
+    - Age
+    - Capitalization or spacing differences
 
-⚠️ Include a name variation in every entry.
+    ⚠️ Include a name variation in every entry.
 
-### Input:
-{json.dumps(user_data, indent=2)}
+    ### Input:
+    {json.dumps(user_data, indent=2)}
 
-### Output Format:
-A JSON list like:
-[
-  {{
-    "name": "...",
-    "phone": "...",
-    "paytm_link": "...",
-    "country": "...",
-    "age": "...",
-    "email": "..."
-  }},
-  ...
-]
+    ### Output Format:
+    A JSON list like:
+    [
+    {{
+        "name": "...",
+        "phone": "...",
+        "paytm_link": "...",
+        "country": "...",
+        "age": "...",
+        "email": "..."
+    }},
+    ...
+    ]
 
-Respond with **only the JSON list**. No extra explanation.
-"""
+    Respond with **only the JSON list**. No extra explanation.
+    """
 
     # Prepare API body
     body = {
@@ -182,7 +190,7 @@ Respond with **only the JSON list**. No extra explanation.
         os.makedirs("output", exist_ok=True)
 
         # Save to file
-        with open("output/permuted_user_data.json", "w") as f:
+        with open("scrap_tools/final/output/permuted_user_data.json", "w") as f:
             json.dump(permutations, f, indent=2)
 
         print(f"[UTIL] ✅ Saved {len(permutations)} permutations to output/permuted_user_data.json")
@@ -192,3 +200,17 @@ Respond with **only the JSON list**. No extra explanation.
         print(f"❌ Failed to parse API response: {e}")
         print("🔍 Raw Response:", response.text)
         return []
+
+if __name__ == "__main__":
+    result = generate_permutations(
+        user_data={
+            "name": "John Doe",
+            "phone": "+1234567890",
+            "paytm_link": "paytm://1234567890",
+            "country": "USA",
+            "age": 30,
+            "email": "test@email"
+        }, num=12
+    )
+
+    print(result)

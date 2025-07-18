@@ -65,7 +65,10 @@ from langchain.llms.base import LLM
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.tools import tool
-from models import AMLReport
+# from models import AMLReport
+import sys
+sys.path.insert(0, 'scrap_tools/final/utils')
+
 from utils.permutation import generate_permutations
 from utils.queries import generate_queries
 from utils.search import run_search
@@ -108,66 +111,90 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 #                 return f"Error: {response.status_code} - {response.text}"
 #         except Exception as e:
 #             return f"Error: {str(e)}"
+
 from crewai import Agent, Crew, Task, Process
 from crewai.project import CrewBase, agent, task, crew, before_kickoff, after_kickoff
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
 from crewai import LLM
 
+
+# llm = LLM(
+#     model="openrouter/meta-llama/llama-3.3-70b-instruct:free",
+#     base_url="https://openrouter.ai/api/v1",
+#     api_key='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',
+#     # stream=True,
+# )
+
+# llm = LLM(
+#     model="openrouter/deepseek/deepseek-r1",
+#     base_url="https://openrouter.ai/api/v1",
+#     api_key="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",
+#     stream=True 
+# )
+
+# llm = LLM(
+#     model="ollama/llama3.2:1b",
+#     base_url="http://localhost:11434"
+# )
+GEMINI_API_KEY="AIzaSyDhbckEeDbDdZKQ-R83T81llxi62yN3Ta8"
 llm = LLM(
-    model="meta-llama/llama-3-8b-instruct",
-    base_url="https://openrouter.ai/api/v1/chat/completions",
-    api_key="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"
+    model="gemini/gemini-2.0-flash",
+    temperature=0.7,
+    api_key=GEMINI_API_KEY,
 )
 
-
-# @tool("permutation_tool")
-# def permutation_tool():
-#     """
-#     Generate permutations for AML based on user inputs.
-
-#     Args:
-#         user_inputs (dict): Dictionary containing user input values for AML.
-#         file_path (str, optional): File path for storing output. Defaults to  permuted_user_data.json "".
-
-#     Returns:
-#         list: A list of generated permutations.
-#     """
-#     print("[CHECKPOINT] Entered permutation_tool")
-#     print(f"[INPUT] user_inputs: {user_inputs} ")
-#     start_time = time.time()
-
-#     result = generate_permutations(user_inputs, user_inputs.get("num_permutations", 5))
-
-#     print(f"[OUTPUT] Generated {len(result)} permutations")
-#     print(f"[TIME] permutation_tool completed in {time.time() - start_time:.2f}s")
-#     print("[CHECKPOINT] Exiting permutation_tool")
-#     return result
-
-@tool("query_tool")
-def query_tool(self):
+@tool("permutation_tool")
+def permutation_tool():
     """
-    Generate AML-related queries from provided permutations.
+    Generate permutations for AML based on user inputs.
 
     Args:
-        permutations (list): A list of permutations generated earlier.
+        user_inputs (dict): Dictionary containing user input values for AML.
+        file_path (str, optional): File path for storing output. Defaults to  permuted_user_data.json "".
 
     Returns:
-        list: A list of generated queries based on permutations.
+        list: A list of generated permutations.
     """
-    print("[CHECKPOINT] Entered query_tool")
-    print(f"[INPUT] permutations count: {len(permutations)}")
+    print("[CHECKPOINT] Entered permutation_tool")
+    print(f"[INPUT] user_inputs: {inputs.get("user_data")} ")
     start_time = time.time()
 
-    result = generate_queries(permutations, queries_per_identity=10)
+    result = generate_permutations(inputs.get("user_data"), inputs.get("user_data").get("num_permutations", 5))
 
-    print(f"[OUTPUT] Generated {len(result)} queries")
-    print(f"[TIME] query_tool completed in {time.time() - start_time:.2f}s")
-    print("[CHECKPOINT] Exiting query_tool")
+    print(f"[OUTPUT] Generated {len(result)} permutations")
+    print(f"[TIME] permutation_tool completed in {time.time() - start_time:.2f}s")
+    print("[CHECKPOINT] Exiting permutation_tool")
     return result
-        
+
+
+# @tool("query_tool")
+# def query_tool():
+#     """
+#     Self-contained tool that loads permutations from file and generates AML queries.
+#     """
+#     import json, time
+#     print("[CHECKPOINT] Entered query_tool")
+    
+#     try:
+#         with open(r"scrap_tools\final\output\permuted_user_data.json", "r") as f:
+#             permutations = json.load(f)
+#             print(permutations)
+#     except Exception as e:
+#         print(f"[ERROR] Failed to load permutations: {e}")
+ 
+#     print(f"[INPUT] permutations count: {len(permutations)}")
+#     start_time = time.time()
+ 
+#     result = generate_queries(permutations, queries_per_identity=10)
+ 
+#     print(f"[OUTPUT] Generated {len(result)} queries")
+#     print(f"[TIME] query_tool completed in {time.time() - start_time:.2f}s")
+#     print("[CHECKPOINT] Exiting query_tool")
+#     return result
+
 @CrewBase
-class LatestAiDevelopmentCrew:
+class LatestAiDevelopmentCrew():
 
 
     """AML Crew with Tool-based Agents"""
@@ -179,13 +206,6 @@ class LatestAiDevelopmentCrew:
 #     tasks_config = os.path.join(BASE_DIR, "config", "tasks.yaml")
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
-     
-#     print("*"*100)
-#     print(agents_config['permutation_agent'])
-#     print(tasks_config['permutation_task'])
-    
-    
-
 
     # ========================
     # Tools
@@ -300,25 +320,25 @@ class LatestAiDevelopmentCrew:
 
 
 
-#     @agent
-#     def permutation_agent(self) -> Agent:
-#         print("[CHECKPOINT] Creating permutation_agent")
-       
-#         return Agent(
-#             config=self.agents_config['permutation_agent'],
-#             tools=[permutation_tool],
-#             verbose=True,
-#             llm=llm
-#         )
     @agent
-    def query_agent(self) -> Agent:
-        print("[CHECKPOINT] Creating query_agent")
+    def permutation_agent(self) -> Agent:
+        print("[CHECKPOINT] Creating permutation_agent")
+        
         return Agent(
-            config=self.agents_config['query_agent'],
-            tools=[query_tool],
+            config=self.agents_config['permutation_agent'],
+            tools=[permutation_tool],
             verbose=True,
             llm=llm
         )
+    # @agent
+    # def query_agent(self) -> Agent:
+    #     print("[CHECKPOINT] Creating query_agent")
+    #     return Agent(
+    #         config=self.agents_config['query_agent'],
+    #         tools=[query_tool],
+    #         verbose=True,
+    #         llm=llm
+    #     )
 
 #     @agent
 #     def query_agent(self) -> Agent:
@@ -381,21 +401,19 @@ class LatestAiDevelopmentCrew:
 #             llm=llm
 #         )
 
-#     @task
-#     def permutation_task(self) -> Task:
-#         print("[CHECKPOINT] Creating permutation_task")
-#         return Task(
-#             config=self.tasks_config["permutation_task"]
-# #             agent=self.permutation_agent(),
-# #             execute=lambda inputs: self.permutation_tool(inputs)
-#         )
-
     @task
-    def query_task(self) -> Task:
-        print("[CHECKPOINT] Creating query_task")
+    def permutation_task(self) -> Task:
+        print("[CHECKPOINT] Creating permutation_task")
         return Task(
-            config=self.tasks_config['query_task']
+            config=self.tasks_config["permutation_task"]
         )
+
+    # @task
+    # def query_task(self) -> Task:
+    #     print("[CHECKPOINT] Creating query_task")
+    #     return Task(
+    #         config=self.tasks_config['query_task']
+    #     )
 
 #     @task
 #     def query_task(self) -> Task:
@@ -462,33 +480,33 @@ class LatestAiDevelopmentCrew:
 
 
 
-    @crew
-    def crew(self) -> Crew:
-        print("[CHECKPOINT] Assembling Crew")
-        print(f"[INFO] Agents count: {len(self.agents)}, Tasks count: {len(self.tasks)}")
-        return Crew(
-            agents=self.agents,
-            tasks=self.tasks,
-            process=Process.sequential,
-            verbose=True
-        )
-
-
-
-
-    # # Create Crew for a single agent
     # @crew
     # def crew(self) -> Crew:
     #     print("[CHECKPOINT] Assembling Crew")
     #     print(f"[INFO] Agents count: {len(self.agents)}, Tasks count: {len(self.tasks)}")
-    #     single_agent = self.query_agent()
-    #     single_task = self.query_task()
     #     return Crew(
-    #         agents=[single_agent],
-    #         tasks=[single_task],
+    #         agents=self.agents,
+    #         tasks=self.tasks,
     #         process=Process.sequential,
     #         verbose=True
     #     )
+
+
+
+
+    # Create Crew for a single agent
+    @crew
+    def crew(self) -> Crew:
+        print("[CHECKPOINT] Assembling Crew")
+        print(f"[INFO] Agents count: {len(self.agents)}, Tasks count: {len(self.tasks)}")
+        single_agent = self.permutation_agent()
+        single_task = self.permutation_task()
+        return Crew(
+            agents=[single_agent],
+            tasks=[single_task],
+            process=Process.sequential,
+            verbose=True,
+        )
     
     
     

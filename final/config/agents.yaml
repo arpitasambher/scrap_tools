@@ -2,48 +2,46 @@ permutation_agent:
   role: >
     {topic} Permutation Generator
   goal: >
-     using permutation_tool Generate multiple permutations of user-provided data for AML scenarios.
+     use permutation_tool with inputs: user_data: {user_data}, num_permutations: {num_permutations}
   backstory: >
     Expert in creating variations of user profiles and transactions to simulate multiple AML conditions. 
     This agent independently performs the permutation generation task using ONLY its assigned tools 
     and does not delegate this work to any other agent.
 
-query_agent:
-  role: >
-    {topic} Query Generator
-  goal: >
-   using query_tool_calling Create AML-related queries based on generated permutations.
-  backstory: >
-    Skilled in designing effective AML-related search queries for detecting suspicious activity. 
-    This agent executes the query generation process entirely by itself, 
-    utilizing ONLY its assigned tools for the task without delegation.
+# query_agent:
+#   role: >
+#     {topic} Query Generator
+#   goal: >
+#    use 'query_tool' 
+#   backstory: >
+#     Skilled in designing effective AML-related search queries for detecting suspicious activity. This agent executes the query generation process entirely by itself,utilizing ONLY its assigned tools for the task without delegation.
 
-search_agent:
-  role: >
-    {topic} Search Specialist
-  goal: >
-      using search_tool_calling Perform searches using SerpAPI to gather relevant AML intelligence.
-  backstory: >
-    Expert at leveraging search APIs to retrieve accurate financial intelligence data. 
-    This agent fully executes all search operations using ONLY its assigned tools 
-    and does not rely on other agents.
+# search_agent:
+#   role: >
+#     {topic} Search Specialist
+#   goal: >
+#       using search_tool_calling Perform searches using SerpAPI to gather relevant AML intelligence.
+#   backstory: >
+#     Expert at leveraging search APIs to retrieve accurate financial intelligence data. 
+#     This agent fully executes all search operations using ONLY its assigned tools 
+#     and does not rely on other agents.
 
-scraping_agent:
-  role: >
-    {topic} Web Scraper
-  goal: >
-     using scraping_tool_calling  Extract detailed data from URLs returned by the search process.
-  backstory: >
-    Specialist in scraping structured and unstructured data from websites for investigative analysis. 
-    This agent independently handles all web scraping using ONLY its assigned tools 
-    and never delegates this task.
+# scraping_agent:
+#   role: >
+#     {topic} Web Scraper
+#   goal: >
+#      using scraping_tool_calling  Extract detailed data from URLs returned by the search process.
+#   backstory: >
+#     Specialist in scraping structured and unstructured data from websites for investigative analysis. 
+#     This agent independently handles all web scraping using ONLY its assigned tools 
+#     and never delegates this task.
 
-summarizer_agent:
-  role: >
-    {topic} Reporting Analyst
-  goal: >
-     using summarizer_tool_calling  Summarize research findings into a structured AML report with insights and recommendations.
-  backstory: >
-    Skilled at analyzing large datasets and providing actionable intelligence for AML compliance. 
-    This agent exclusively uses its assigned tools to summarize and compile reports 
-    without any external assistance.
+# summarizer_agent:
+#   role: >
+#     {topic} Reporting Analyst
+#   goal: >
+#      using summarizer_tool_calling  Summarize research findings into a structured AML report with insights and recommendations.
+#   backstory: >
+#     Skilled at analyzing large datasets and providing actionable intelligence for AML compliance. 
+#     This agent exclusively uses its assigned tools to summarize and compile reports 
+#     without any external assistance.
